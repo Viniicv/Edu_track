@@ -35,7 +35,7 @@ O **EduTrack** é um aplicativo focado em ajudar estudantes a organizar suas pri
 * **Responsabilidades:**  Montar a tela inicial do aplicativo.
   * Crar os campos de digitar texto (como e-mail e senha) e alinhar os botões na tela.
 
-**Membro 4: [Nome do Integrante 4]**
+**Membro 4: André Luiz Bispo**
 * **Telas:** **Matérias e Progressos** e **Adicionar Matéria**
 * **Responsabilidades:**  Desenhar a lista de matérias.
   * Fazer a tela simples onde o usuário digita o nome de uma nova matéria.
