@@ -30,7 +30,7 @@ O **EduTrack** é um aplicativo focado em ajudar estudantes a organizar suas pri
 * **Responsabilidades:**  Fazer a lógica dessa tela, que precisa identificar as datas e separar automaticamente as tarefas em "Hoje: Urgente" e "Essa Semana".
   * Preparar a "base de dados" (onde as tarefas e matérias vão ficar salvas para aparecerem nas telas).
 
-**Membro 3: [Nome do Integrante 3]**
+**Membro 3: Luiz Gustavo Meneses Santos **
 * **Telas:** **Login** e **Cadastro**
 * **Responsabilidades:**  Montar a tela inicial do aplicativo.
   * Crar os campos de digitar texto (como e-mail e senha) e alinhar os botões na tela.
