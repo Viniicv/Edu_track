@@ -19,7 +19,7 @@ O **EduTrack** é um aplicativo focado em ajudar estudantes a organizar suas pri
 
 ## 👥 Divisão de Telas por Integrante
 
-**Membro 1: [Nome do Integrante 1]**
+**Membro 1: Caio Vinicius Horacio Silva**
 * **Tela Principal:** **Calendário Acadêmico**
 * **Responsabilidades:**  Fazer o calendário funcionar e mostrar as tarefas no dia certo.
   * Criar a barra de navegação inferior (os botões de Início, Calendário e Matérias que ficam no rodapé).
