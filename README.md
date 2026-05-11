@@ -21,33 +21,28 @@ O **EduTrack** é um aplicativo focado em ajudar estudantes a organizar suas pri
 
 **Membro 1: [Nome do Integrante 1]**
 * **Tela Principal:** **Calendário Acadêmico**
-* **Responsabilidades:** * Fazer o calendário funcionar e mostrar as tarefas no dia certo (usar pacotes de calendário no Flutter é mais complexo).
+* **Responsabilidades:**  Fazer o calendário funcionar e mostrar as tarefas no dia certo.
   * Criar a barra de navegação inferior (os botões de Início, Calendário e Matérias que ficam no rodapé).
   * Ajudar a configurar as cores e fontes padrão do projeto.
 
 **Membro 2: Emanoel Lima Barbosa**
 * **Tela Principal:** **Página Inicial (Início)**
-* **Responsabilidades:** * Fazer a lógica dessa tela, que precisa identificar as datas e separar automaticamente as tarefas em "Hoje: Urgente" e "Essa Semana".
+* **Responsabilidades:**  Fazer a lógica dessa tela, que precisa identificar as datas e separar automaticamente as tarefas em "Hoje: Urgente" e "Essa Semana".
   * Preparar a "base de dados" (onde as tarefas e matérias vão ficar salvas para aparecerem nas telas).
-
-### 🌱 Desenvolvedores Iniciantes (Aprendendo Flutter)
-Ficarão responsáveis por desenhar as telas, colocar os textos, botões e caixas de preenchimento nos lugares certos. É a melhor forma de treinar o layout no Flutter.
 
 **Membro 3: [Nome do Integrante 3]**
 * **Telas:** **Login** e **Cadastro**
-* **Responsabilidades:** * Montar a tela inicial do aplicativo.
-  * Aprender a usar os campos de digitar texto (como e-mail e senha) e alinhar os botões na tela.
+* **Responsabilidades:**  Montar a tela inicial do aplicativo.
+  * Crar os campos de digitar texto (como e-mail e senha) e alinhar os botões na tela.
 
 **Membro 4: [Nome do Integrante 4]**
 * **Telas:** **Matérias e Progressos** e **Adicionar Matéria**
-* **Responsabilidades:** * Desenhar a lista de matérias.
-  * O desafio legal aqui é desenhar aquela "barrinha azul" de progresso debaixo do nome de cada matéria.
+* **Responsabilidades:**  Desenhar a lista de matérias.
   * Fazer a tela simples onde o usuário digita o nome de uma nova matéria.
 
-**Membro 5: [Nome do Integrante 5]**
+**Membro 5: Jhoan Guilherme Silva Santos**
 * **Telas:** **Listas de Atividades** e **Adicionar Tarefa**
-* **Responsabilidades:** * Fazer a tela que lista todas as tarefas criadas pelo usuário.
-  * O desafio aqui é criar o "quadradinho" da tarefa (com a caixinha de marcar do lado esquerdo).
+* **Responsabilidades:**  Fazer a tela que lista todas as tarefas criadas pelo usuário.
   * Montar a tela onde o usuário preenche o Título, Data e escolhe a Matéria da tarefa.
 
 ---
