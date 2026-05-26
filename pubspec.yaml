@@ -1,0 +1,42 @@
+name: edutrack_app
+description: App de organização acadêmica para estudantes
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Ícones e UI
+  cupertino_icons: ^1.0.6
+  google_fonts: ^8.1.0
+  
+  # Gerenciamento de estado
+  provider: ^6.1.1
+  
+  # Armazenamento local
+  shared_preferences: ^2.2.2
+  
+  # Utilitários
+  intl: ^0.18.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  
+  # Assets - imagens do projeto
+  assets:
+    - assets/images/
+    - assets/images/logo.png
+  
+  # Fontes customizadas (opcional)
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: assets/fonts/CustomFont.ttf
