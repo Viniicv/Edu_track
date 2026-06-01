@@ -14,82 +14,74 @@ class SubjectsScreen extends StatelessWidget {
     this.showBottomNavigation = true,
   });
 
+  static const _progressColor = AppColors.primary;
+  static const _screenBackground = Color(0xFFF3F3F3);
+  static const _trackColor = Color(0xFFD9D9D9);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Nova Matéria',
-                  style: AppTextStyles.title,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add_circle, color: AppColors.primary),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const AddSubjectScreen()),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Consumer<SubjectProvider>(
-              builder: (context, subjectProvider, _) {
-                final subjects = subjectProvider.subjects;
-
-                if (subjects.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.book_outlined,
-                          size: 64,
-                          color: AppColors.textSecondary,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Nenhuma matéria cadastrada',
-                          style: AppTextStyles.subtitle,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const AddSubjectScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text('Adicionar Matéria'),
-                        ),
-                      ],
+      backgroundColor: _screenBackground,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 72),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: SizedBox(
+                width: double.infinity,
+                height: 36,
+                child: ElevatedButton(
+                  onPressed: () => _openAddSubject(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      side: const BorderSide(
+                        color: Colors.black,
+                        width: 2,
+                      ),
                     ),
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: subjects.length,
-                  itemBuilder: (context, index) {
-                    final subject = subjects[index];
-                    return _buildSubjectCard(context, subject);
-                  },
-                );
-              },
+                  ),
+                  child: const Text(
+                    'Nova Matéria',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Expanded(
+              child: Consumer<SubjectProvider>(
+                builder: (context, subjectProvider, _) {
+                  final subjects = subjectProvider.subjects;
+
+                  if (subjects.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Nenhuma matéria cadastrada',
+                        style: AppTextStyles.subtitle,
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 19),
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      return _buildSubjectItem(subjects[index]);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: showBottomNavigation
           ? BottomNavigationBar(
@@ -117,8 +109,8 @@ class SubjectsScreen extends StatelessWidget {
                   label: 'Calendário',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.book_outlined),
-                  activeIcon: Icon(Icons.book),
+                  icon: Icon(Icons.list_alt_outlined),
+                  activeIcon: Icon(Icons.list_alt),
                   label: 'Matérias',
                 ),
               ],
@@ -127,52 +119,58 @@ class SubjectsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSubjectCard(BuildContext context, Subject subject) {
-    final color = Color(int.parse(subject.color.replaceFirst('#', '0xFF')));
-
+  Widget _buildSubjectItem(Subject subject) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.fromLTRB(14, 7, 14, 10),
+      decoration: BoxDecoration(
+        color: _screenBackground,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color(0xFFD3D5DB),
+          width: 1,
+        ),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    subject.name,
-                    style: AppTextStyles.cardTitle,
-                  ),
-                ],
-              ),
-              Text(
-                '${subject.progress}% Concluído',
-                style: AppTextStyles.progressLabel,
-              ),
-            ],
+          Text(
+            subject.name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
+          Text(
+            '${subject.progress}% Concluído',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(999),
             child: LinearProgressIndicator(
               value: subject.progress / 100,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation(color),
-              minHeight: 10,
+              backgroundColor: _trackColor,
+              valueColor: const AlwaysStoppedAnimation(_progressColor),
+              minHeight: 8,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _openAddSubject(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AddSubjectScreen()),
     );
   }
 }

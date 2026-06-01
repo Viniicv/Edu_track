@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/activity_provider.dart';
 import 'providers/subject_provider.dart';
@@ -6,6 +6,7 @@ import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/add_activity_screen.dart';
 import 'screens/add_subject_screen.dart';
 import 'screens/activities_list_screen.dart';
 import 'utils/theme.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
           '/home': (context) => const HomeScreen(),
           '/calendar': (context) => const HomeScreen(initialIndex: 1),
           '/subjects': (context) => const HomeScreen(initialIndex: 2),
+          '/add_activity': (context) => const AddActivityScreen(),
           '/add_subject': (context) => const AddSubjectScreen(),
           '/activities': (context) => const ActivitiesListScreen(),
         },

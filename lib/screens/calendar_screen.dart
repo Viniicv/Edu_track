@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/activity_provider.dart';
 import '../models/activity_model.dart';
@@ -70,7 +70,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           });
                         },
                       ),
-
                       Row(
                         children: [
                           Text(
@@ -80,9 +79,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-
                           const SizedBox(width: 8),
-
                           Text(
                             _currentMonth.year.toString(),
                             style: const TextStyle(
@@ -92,7 +89,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                         ],
                       ),
-
                       IconButton(
                         icon: const Icon(Icons.chevron_right),
                         onPressed: () {
@@ -214,9 +210,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Container(
             margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? AppColors.primary
-                  : Colors.grey.shade100,
+              color: isSelected ? AppColors.primary : Colors.grey.shade100,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -225,12 +219,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Text(
                   dayNumber.toString(),
                   style: TextStyle(
-                    color:
-                        isSelected ? Colors.white : Colors.black87,
+                    color: isSelected ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-
                 if (hasTasks && !isSelected)
                   Container(
                     margin: const EdgeInsets.only(top: 4),
@@ -252,8 +244,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _buildTasksForDay() {
     return Consumer<ActivityProvider>(
       builder: (context, activityProvider, _) {
-        final tasks =
-            activityProvider.getActivitiesByDate(_selectedDate);
+        final tasks = activityProvider.getActivitiesByDate(_selectedDate);
 
         if (tasks.isEmpty) {
           return Center(
@@ -298,7 +289,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -313,15 +304,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
               borderRadius: BorderRadius.circular(4),
             ),
             onChanged: (bool? value) {
-              final provider =
-                  Provider.of<ActivityProvider>(
+              final provider = Provider.of<ActivityProvider>(
                 context,
                 listen: false,
               );
 
               task.isCompleted = value ?? false;
-              task.progress =
-                  task.isCompleted ? 100 : 0;
+              task.progress = task.isCompleted ? 100 : 0;
 
               provider.updateActivity(task);
 
@@ -334,8 +323,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           // TEXTO
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   task.title,
@@ -343,14 +331,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    decoration: task.isCompleted
-                        ? TextDecoration.lineThrough
-                        : null,
+                    decoration:
+                        task.isCompleted ? TextDecoration.lineThrough : null,
                   ),
                 ),
-
                 const SizedBox(height: 4),
-
                 Text(
                   task.subject,
                   style: TextStyle(
@@ -377,9 +362,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _showAddTaskDialog(
-      BuildContext context,
-      DateTime date,
-      ) {
+    BuildContext context,
+    DateTime date,
+  ) {
     final titleController = TextEditingController();
 
     String selectedSubject = 'Dispositivos Móveis';
@@ -410,9 +395,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-
               const SizedBox(height: 12),
-
               DropdownButtonFormField<String>(
                 initialValue: selectedSubject,
                 decoration: const InputDecoration(
@@ -431,37 +414,48 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
             ],
           ),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: 44,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (titleController.text.isNotEmpty) {
+                        final newTask = Activity(
+                          id: DateTime.now().millisecondsSinceEpoch,
+                          title: titleController.text,
+                          subject: selectedSubject,
+                          dueDate: date,
+                          isUrgent: false,
+                          isCompleted: false,
+                          progress: 0,
+                        );
 
-            ElevatedButton(
-              onPressed: () {
-                if (titleController.text.isNotEmpty) {
-                  final newTask = Activity(
-                    id: DateTime.now()
-                        .millisecondsSinceEpoch,
-                    title: titleController.text,
-                    subject: selectedSubject,
-                    dueDate: date,
-                    isUrgent: false,
-                    isCompleted: false,
-                    progress: 0,
-                  );
+                        Provider.of<ActivityProvider>(
+                          context,
+                          listen: false,
+                        ).addActivity(newTask);
 
-                  Provider.of<ActivityProvider>(
-                    context,
-                    listen: false,
-                  ).addActivity(newTask);
+                        Navigator.pop(context);
 
-                  Navigator.pop(context);
-
-                  setState(() {});
-                }
-              },
-              child: const Text('Adicionar'),
+                        setState(() {});
+                      }
+                    },
+                    child: const Text('Adicionar'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 44,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancelar'),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -470,9 +464,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _showDeleteConfirmation(
-      BuildContext context,
-      Activity task,
-      ) {
+    BuildContext context,
+    Activity task,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -486,7 +480,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancelar'),
             ),
-
             TextButton(
               onPressed: () {
                 Provider.of<ActivityProvider>(
@@ -510,14 +503,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   bool _hasTasksOnDate(DateTime date) {
-    final provider =
-        Provider.of<ActivityProvider>(
+    final provider = Provider.of<ActivityProvider>(
       context,
       listen: false,
     );
 
-    final tasks =
-        provider.getActivitiesByDate(date);
+    final tasks = provider.getActivitiesByDate(date);
 
     return tasks.isNotEmpty;
   }

@@ -1,4 +1,3 @@
-import 'package:edutrack_app/widgets/logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +5,7 @@ import '../providers/activity_provider.dart';
 import '../utils/theme.dart';
 import '../core/app_colors.dart';
 import '../core/app_text_styles.dart';
+import 'add_activity_screen.dart';
 import 'calendar_screen.dart';
 import 'subjects_screen.dart';
 
@@ -40,6 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              elevation: 6,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddActivityScreen()),
+                );
+              },
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
@@ -80,34 +93,11 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        SliverAppBar(
-          floating: true,
-          pinned: false,
-          title: Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child:
-                    const Center(child: LogoWidget(size: 24, showText: false)),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'EDUTRACK',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
-            ],
-          ),
-        ),
         SliverToBoxAdapter(
-          child: _buildHeader(context),
+          child: SafeArea(
+            bottom: false,
+            child: _buildTopHeader(context),
+          ),
         ),
         SliverToBoxAdapter(
           child: _buildUrgentSection(context),
@@ -122,26 +112,75 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
+  Widget _buildTopHeader(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: const Border(
+          bottom: BorderSide(color: Color(0xFFBFC5D2)),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'EDUTRACK',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              Tooltip(
+                message: 'Sair',
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(6),
+                  onTap: () => _logout(context),
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Icon(
+                      Icons.logout,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           FutureBuilder<String>(
             future: _getUserName(),
             builder: (context, snapshot) {
               final name = snapshot.data ?? 'Estudante';
               return Text(
-                'Olá, $name!',
-                style: AppTextStyles.heading,
+                'Olá, ${name.toUpperCase()}!',
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
               );
             },
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Aqui estão suas prioridades:',
-            style: AppTextStyles.subtitle,
+          const SizedBox(height: 6),
+          const Text(
+            'Aqui estão as suas prioridades:',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -151,6 +190,15 @@ class HomeContent extends StatelessWidget {
   Future<String> _getUserName() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userName') ?? 'Estudante';
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('userName');
+
+    navigator.pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
   Widget _buildUrgentSection(BuildContext context) {
