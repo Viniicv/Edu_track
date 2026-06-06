@@ -140,6 +140,8 @@ class ActivitiesListScreen extends StatelessWidget {
                 foregroundColor: const Color(0xFFEF4444),
               ),
               onPressed: () {
+                if (activity.id == null) return;
+
                 Provider.of<ActivityProvider>(
                   context,
                   listen: false,

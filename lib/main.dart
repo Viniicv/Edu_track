@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'providers/activity_provider.dart';
 import 'providers/subject_provider.dart';
 import 'screens/splash_screen.dart';
@@ -11,7 +13,11 @@ import 'screens/add_subject_screen.dart';
 import 'screens/activities_list_screen.dart';
 import 'utils/theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

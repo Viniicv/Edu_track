@@ -35,7 +35,7 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
     }
   }
 
-  void _saveActivity() {
+  Future<void> _saveActivity() async {
     if (_titleController.text.trim().isEmpty ||
         _dateController.text.isEmpty ||
         _selectedSubject == null) {
@@ -60,8 +60,12 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
       progress: 0,
     );
 
-    Provider.of<ActivityProvider>(context, listen: false).addActivity(activity);
+    await Provider.of<ActivityProvider>(
+      context,
+      listen: false,
+    ).addActivity(activity);
 
+    if (!mounted) return;
     Navigator.pop(context);
   }
 
@@ -125,13 +129,22 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
               const SizedBox(height: 12),
               _buildLabel('Selecione a Matéria'),
               const SizedBox(height: 6),
-              _buildDropdown(subjects),
+              if (subjects.isEmpty)
+                const Text(
+                  'Cadastre uma matéria antes de criar atividades.',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 12,
+                  ),
+                )
+              else
+                _buildDropdown(subjects),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 height: 36,
                 child: ElevatedButton(
-                  onPressed: _saveActivity,
+                  onPressed: subjects.isEmpty ? null : _saveActivity,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E3A8A),
                     elevation: 0,

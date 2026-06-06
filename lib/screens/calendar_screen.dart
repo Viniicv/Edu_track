@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/activity_provider.dart';
+import '../providers/subject_provider.dart';
 import '../models/activity_model.dart';
 import '../core/app_colors.dart';
 import '../core/app_text_styles.dart';
@@ -28,7 +29,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         elevation: 0,
       ),
 
-      // BOTÃO FLUTUANTE
+      // BOTÃƒO FLUTUANTE
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         elevation: 6,
@@ -43,7 +44,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           children: [
             const SizedBox(height: 8),
 
-            // CARD DO CALENDÁRIO
+            // CARD DO CALENDÃRIO
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(16),
@@ -54,7 +55,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               child: Column(
                 children: [
-                  // MÊS E ANO
+                  // MÃŠS E ANO
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -138,7 +139,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
             const SizedBox(height: 16),
 
-            // TÍTULO
+            // TÃTULO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Align(
@@ -366,17 +367,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
     DateTime date,
   ) {
     final titleController = TextEditingController();
+    final subjects = Provider.of<SubjectProvider>(
+      context,
+      listen: false,
+    ).subjects;
 
-    String selectedSubject = 'Dispositivos Móveis';
+    if (subjects.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cadastre uma matéria antes de criar tarefas.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-    final subjects = [
-      'Dispositivos Móveis',
-      'Back End',
-      'Front End',
-      'Banco de Dados',
-      'Empreendedorismo',
-      'Residência de Software'
-    ];
+    String selectedSubject = subjects.first.name;
 
     showDialog(
       context: context,
@@ -404,8 +410,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 items: subjects.map((subject) {
                   return DropdownMenuItem(
-                    value: subject,
-                    child: Text(subject),
+                    value: subject.name,
+                    child: Text(subject.name),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -422,27 +428,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 SizedBox(
                   height: 44,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (titleController.text.isNotEmpty) {
-                        final newTask = Activity(
-                          id: DateTime.now().millisecondsSinceEpoch,
-                          title: titleController.text,
-                          subject: selectedSubject,
-                          dueDate: date,
-                          isUrgent: false,
-                          isCompleted: false,
-                          progress: 0,
-                        );
+                    onPressed: () async {
+                      if (titleController.text.trim().isEmpty) return;
 
-                        Provider.of<ActivityProvider>(
-                          context,
-                          listen: false,
-                        ).addActivity(newTask);
+                      final newTask = Activity(
+                        title: titleController.text.trim(),
+                        subject: selectedSubject,
+                        dueDate: date,
+                        isUrgent: false,
+                        isCompleted: false,
+                        progress: 0,
+                      );
 
-                        Navigator.pop(context);
+                      await Provider.of<ActivityProvider>(
+                        context,
+                        listen: false,
+                      ).addActivity(newTask);
 
-                        setState(() {});
-                      }
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
                     },
                     child: const Text('Adicionar'),
                   ),
@@ -482,6 +486,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             TextButton(
               onPressed: () {
+                if (task.id == null) return;
+
                 Provider.of<ActivityProvider>(
                   context,
                   listen: false,
@@ -517,7 +523,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     const months = [
       'Janeiro',
       'Fevereiro',
-      'Março',
+      'MarÃ§o',
       'Abril',
       'Maio',
       'Junho',

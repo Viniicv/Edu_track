@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isInstitutionalEmail() {
+      return isSignedIn()
+        && request.auth.token.email.matches('.*@souunit\\.com\\.br$');
+    }
+
+    function ownsExistingDocument() {
+      return isInstitutionalEmail()
+        && resource.data.usuario_logado == request.auth.token.email;
+    }
+
+    function ownsNewDocument() {
+      return isInstitutionalEmail()
+        && request.resource.data.usuario_logado == request.auth.token.email;
+    }
+
+    match /{document=**} {
+      allow read: if ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument() && ownsNewDocument();
+      allow delete: if ownsExistingDocument();
+    }
+  }
+}

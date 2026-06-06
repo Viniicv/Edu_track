@@ -16,11 +16,12 @@ dependencies:
   # Gerenciamento de estado
   provider: ^6.1.1
   
-  # Armazenamento local
-  shared_preferences: ^2.2.2
-  
   # Utilitários
   intl: ^0.18.1
+  firebase_core: ^4.10.0
+  cloud_firestore: ^6.5.0
+  firebase_auth: ^6.5.2
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:

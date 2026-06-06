@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "edutrack-edu",
+          "appId": "1:543136728839:android:aed1aeec6d5ee740b9e7a2",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "edutrack-edu",
+          "configurations": {
+            "android": "1:543136728839:android:aed1aeec6d5ee740b9e7a2",
+            "ios": "1:543136728839:ios:2bbe302fd3a47388b9e7a2",
+            "macos": "1:543136728839:ios:2bbe302fd3a47388b9e7a2",
+            "web": "1:543136728839:web:c6d25e882514756fb9e7a2",
+            "windows": "1:543136728839:web:cee49b778263a478b9e7a2"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

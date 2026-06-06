@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/activity_provider.dart';
+import '../services/auth_service.dart';
 import '../utils/theme.dart';
 import '../core/app_colors.dart';
 import '../core/app_text_styles.dart';
@@ -165,7 +165,7 @@ class HomeContent extends StatelessWidget {
             builder: (context, snapshot) {
               final name = snapshot.data ?? 'Estudante';
               return Text(
-                'Olá, ${name.toUpperCase()}!',
+                'Olá, $name!',
                 style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 16,
@@ -188,15 +188,12 @@ class HomeContent extends StatelessWidget {
   }
 
   Future<String> _getUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('userName') ?? 'Estudante';
+    return AuthService.instance.safeGreetingName;
   }
 
   Future<void> _logout(BuildContext context) async {
     final navigator = Navigator.of(context);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    await prefs.remove('userName');
+    await AuthService.instance.signOut();
 
     navigator.pushNamedAndRemoveUntil('/login', (route) => false);
   }
