@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
@@ -65,6 +66,18 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithGoogle() async {
+    if (kIsWeb) {
+      final provider = GoogleAuthProvider()
+        ..setCustomParameters({'hd': 'souunit.com.br'});
+      final credential = await _auth.signInWithPopup(provider);
+      return _ensureAllowedCredential(credential);
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      throw const GoogleSignInUnsupportedPlatformException();
+    }
+
     await _ensureGoogleInitialized();
 
     final googleUser = await _googleSignIn.authenticate();
@@ -115,6 +128,15 @@ class AuthService {
     if (!isInstitutionalEmail(email)) {
       throw const AuthDomainException();
     }
+  }
+}
+
+class GoogleSignInUnsupportedPlatformException implements Exception {
+  const GoogleSignInUnsupportedPlatformException();
+
+  @override
+  String toString() {
+    return 'Login com Google disponível no Android/iOS/macOS ou no navegador.';
   }
 }
 

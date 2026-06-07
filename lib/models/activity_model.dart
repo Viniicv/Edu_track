@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Activity {
   String? id;
   String title;
+  String? subjectId;
   String subject;
   DateTime dueDate;
   bool isUrgent;
@@ -14,6 +15,7 @@ class Activity {
 
   Activity({
     this.id,
+    this.subjectId,
     required this.title,
     required this.subject,
     required this.dueDate,
@@ -33,6 +35,7 @@ class Activity {
     return Activity(
       id: document.id,
       title: data['title'] as String? ?? '',
+      subjectId: data['subjectId'] as String?,
       subject: data['subject'] as String? ?? '',
       dueDate: _readDate(data['dueDate']) ?? DateTime.now(),
       isUrgent: data['isUrgent'] as bool? ?? false,
@@ -50,6 +53,7 @@ class Activity {
   }) {
     return {
       'title': title.trim(),
+      if (subjectId != null) 'subjectId': subjectId,
       'subject': subject.trim(),
       'dueDate': Timestamp.fromDate(dueDate),
       'isUrgent': isUrgent,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/activity_model.dart';
+import '../models/subject_model.dart';
 import '../providers/activity_provider.dart';
 import '../providers/subject_provider.dart';
 
@@ -16,7 +17,7 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
   final _titleController = TextEditingController();
   final _dateController = TextEditingController();
 
-  String? _selectedSubject;
+  String? _selectedSubjectId;
 
   Future<void> _selectDate() async {
     final now = DateTime.now();
@@ -38,7 +39,7 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
   Future<void> _saveActivity() async {
     if (_titleController.text.trim().isEmpty ||
         _dateController.text.isEmpty ||
-        _selectedSubject == null) {
+        _selectedSubjectId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Preencha todos os campos')),
       );
@@ -46,10 +47,23 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
     }
 
     final parts = _dateController.text.split('/');
+    final subjectProvider = Provider.of<SubjectProvider>(
+      context,
+      listen: false,
+    );
+    final selectedSubject = subjectProvider.getSubjectById(_selectedSubjectId!);
+
+    if (selectedSubject == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Matéria selecionada não encontrada')),
+      );
+      return;
+    }
 
     final activity = Activity(
       title: _titleController.text.trim(),
-      subject: _selectedSubject!,
+      subjectId: selectedSubject.id,
+      subject: selectedSubject.name,
       dueDate: DateTime(
         int.parse(parts[2]),
         int.parse(parts[1]),
@@ -60,10 +74,20 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
       progress: 0,
     );
 
-    await Provider.of<ActivityProvider>(
-      context,
-      listen: false,
-    ).addActivity(activity);
+    try {
+      await Provider.of<ActivityProvider>(
+        context,
+        listen: false,
+      ).addActivity(activity);
+    } on DuplicateActivityException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Já existe uma tarefa com esse nome nesta matéria.'),
+        ),
+      );
+      return;
+    }
 
     if (!mounted) return;
     Navigator.pop(context);
@@ -71,7 +95,9 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subjects = Provider.of<SubjectProvider>(context).subjects;
+    final subjectProvider = Provider.of<SubjectProvider>(context);
+    final subjects = subjectProvider.subjects;
+    final isLoadingSubjects = subjectProvider.isLoading;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3F3),
@@ -129,7 +155,25 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
               const SizedBox(height: 12),
               _buildLabel('Selecione a Matéria'),
               const SizedBox(height: 6),
-              if (subjects.isEmpty)
+              if (isLoadingSubjects)
+                const Row(
+                  children: [
+                    SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Carregando matérias...',
+                      style: TextStyle(
+                        color: Color(0xFF7B8190),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                )
+              else if (subjects.isEmpty)
                 const Text(
                   'Cadastre uma matéria antes de criar atividades.',
                   style: TextStyle(
@@ -144,7 +188,9 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
                 width: double.infinity,
                 height: 36,
                 child: ElevatedButton(
-                  onPressed: subjects.isEmpty ? null : _saveActivity,
+                  onPressed: isLoadingSubjects || subjects.isEmpty
+                      ? null
+                      : _saveActivity,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E3A8A),
                     elevation: 0,
@@ -187,7 +233,7 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
     );
   }
 
-  Widget _buildDropdown(List subjects) {
+  Widget _buildDropdown(List<Subject> subjects) {
     return Container(
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -198,20 +244,20 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: _selectedSubject,
+          value: _selectedSubjectId,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, size: 20),
           hint: const Text(''),
           style: const TextStyle(fontSize: 13, color: Colors.black),
           items: subjects.map<DropdownMenuItem<String>>((subject) {
             return DropdownMenuItem<String>(
-              value: subject.name,
+              value: subject.id,
               child: Center(child: Text(subject.name)),
             );
           }).toList(),
           onChanged: (value) {
             setState(() {
-              _selectedSubject = value;
+              _selectedSubjectId = value;
             });
           },
         ),

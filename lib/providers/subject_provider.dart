@@ -24,7 +24,7 @@ class SubjectProvider extends ChangeNotifier {
         return;
       }
 
-      _listenToUserSubjects(email!.trim().toLowerCase());
+      _listenToUserSubjects(email!.trim());
     });
   }
 
@@ -90,7 +90,7 @@ class SubjectProvider extends ChangeNotifier {
   }
 
   String _currentInstitutionalEmail() {
-    final email = AuthService.instance.currentUser?.email?.trim().toLowerCase();
+    final email = AuthService.instance.currentUser?.email?.trim();
     if (!AuthService.isInstitutionalEmail(email)) {
       throw const AuthDomainException();
     }

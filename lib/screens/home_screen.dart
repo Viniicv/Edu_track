@@ -4,6 +4,9 @@ import '../providers/activity_provider.dart';
 import '../services/auth_service.dart';
 import '../utils/theme.dart';
 import '../core/app_colors.dart';
+import '../core/app_icon_sizes.dart';
+import '../core/app_radius.dart';
+import '../core/app_spacing.dart';
 import '../core/app_text_styles.dart';
 import 'add_activity_screen.dart';
 import 'calendar_screen.dart';
@@ -50,12 +53,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (_) => const AddActivityScreen()),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.white),
+              child: const Icon(
+                Icons.add,
+                color: AppColors.surface,
+                size: AppIconSizes.main,
+              ),
             )
           : null,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
         currentIndex: _selectedIndex,
@@ -103,10 +110,13 @@ class HomeContent extends StatelessWidget {
           child: _buildUrgentSection(context),
         ),
         SliverToBoxAdapter(
+          child: _buildThisWeekSection(context),
+        ),
+        SliverToBoxAdapter(
           child: _buildNextWeekSection(context),
         ),
         const SliverToBoxAdapter(
-          child: SizedBox(height: 80),
+          child: SizedBox(height: AppSpacing.buttonHeight + 32),
         ),
       ],
     );
@@ -115,11 +125,16 @@ class HomeContent extends StatelessWidget {
   Widget _buildTopHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.horizontalPadding,
+        AppSpacing.horizontalPadding,
+        AppSpacing.horizontalPadding,
+        AppSpacing.smallGap,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         border: const Border(
-          bottom: BorderSide(color: Color(0xFFBFC5D2)),
+          bottom: BorderSide(color: AppColors.border),
         ),
       ),
       child: Column(
@@ -131,35 +146,35 @@ class HomeContent extends StatelessWidget {
               const Text(
                 'EDUTRACK',
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: AppColors.textPrimary,
                   fontSize: 20,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: 0.2,
                 ),
               ),
               Tooltip(
                 message: 'Sair',
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppRadius.input),
                   onTap: () => _logout(context),
                   child: Container(
-                    width: 20,
-                    height: 20,
+                    width: AppIconSizes.button,
+                    height: AppIconSizes.button,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(AppRadius.input / 2),
                     ),
                     child: const Icon(
                       Icons.logout,
-                      color: Colors.white,
-                      size: 14,
+                      color: AppColors.surface,
+                      size: AppIconSizes.small,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.smallGap + 4),
           FutureBuilder<String>(
             future: _getUserName(),
             builder: (context, snapshot) {
@@ -167,19 +182,19 @@ class HomeContent extends StatelessWidget {
               return Text(
                 'Olá, $name!',
                 style: const TextStyle(
-                  color: AppColors.primary,
+                  color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
               );
             },
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.smallGap),
           const Text(
             'Aqui estão as suas prioridades:',
             style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 14,
+              color: AppColors.textSecondary,
+              fontSize: 16,
             ),
           ),
         ],
@@ -201,10 +216,10 @@ class HomeContent extends StatelessWidget {
   Widget _buildUrgentSection(BuildContext context) {
     return Consumer<ActivityProvider>(
       builder: (context, activityProvider, _) {
-        final urgentActivities = activityProvider.getTodayUrgentActivities();
+        final todayActivities = activityProvider.getTodayPendingActivities();
 
         return Container(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AppSpacing.horizontalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -213,11 +228,11 @@ class HomeContent extends StatelessWidget {
                 title: 'Hoje: URGENTE!',
                 color: AppTheme.urgentColor,
               ),
-              const SizedBox(height: 12),
-              if (urgentActivities.isEmpty)
+              const SizedBox(height: AppSpacing.smallGap + 4),
+              if (todayActivities.isEmpty)
                 _buildEmptyCard('Nenhuma tarefa urgente!')
               else
-                ...urgentActivities.map((activity) => _buildTaskCard(
+                ...todayActivities.map((activity) => _buildTaskCard(
                       context,
                       activity.title,
                       activity.subject,
@@ -234,10 +249,11 @@ class HomeContent extends StatelessWidget {
   Widget _buildNextWeekSection(BuildContext context) {
     return Consumer<ActivityProvider>(
       builder: (context, activityProvider, _) {
-        final nextWeekActivities = activityProvider.getNextWeekActivities();
+        final nextWeekActivities =
+            activityProvider.getNextWeekPendingActivities();
 
         return Container(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AppSpacing.horizontalPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -246,7 +262,7 @@ class HomeContent extends StatelessWidget {
                 title: 'Próxima semana',
                 color: AppColors.primary,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.smallGap + 4),
               if (nextWeekActivities.isEmpty)
                 _buildEmptyCard('Nenhuma atividade para a próxima semana')
               else
@@ -256,17 +272,53 @@ class HomeContent extends StatelessWidget {
                       activity.subject,
                       activity.dueDate,
                     )),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.smallGap),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pushNamed(context, '/activities');
                   },
-                  icon: const Icon(Icons.list_alt),
+                  icon: const Icon(
+                    Icons.list_alt,
+                    size: AppIconSizes.button,
+                  ),
                   label: const Text('Ver lista de atividades'),
                 ),
               ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildThisWeekSection(BuildContext context) {
+    return Consumer<ActivityProvider>(
+      builder: (context, activityProvider, _) {
+        final thisWeekActivities =
+            activityProvider.getThisWeekPendingActivities();
+
+        return Container(
+          margin: const EdgeInsets.all(AppSpacing.horizontalPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionTitle(
+                context,
+                title: 'Essa semana',
+                color: AppColors.primary,
+              ),
+              const SizedBox(height: AppSpacing.smallGap + 4),
+              if (thisWeekActivities.isEmpty)
+                _buildEmptyCard('Nenhuma atividade para esta semana')
+              else
+                ...thisWeekActivities.take(3).map((activity) => _buildTaskCard(
+                      context,
+                      activity.title,
+                      activity.subject,
+                      activity.dueDate,
+                    )),
             ],
           ),
         );
@@ -280,22 +332,22 @@ class HomeContent extends StatelessWidget {
     required Color color,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.smallGap),
       child: Row(
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: AppSpacing.smallGap,
+            height: AppSpacing.smallGap,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.smallGap),
           Text(
             title,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                   color: color,
                 ),
           ),
@@ -307,7 +359,7 @@ class HomeContent extends StatelessWidget {
   Widget _buildEmptyCard(String message) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.sectionGap + 8),
         child: Center(
           child: Text(
             message,
@@ -326,30 +378,30 @@ class HomeContent extends StatelessWidget {
     DateTime dueDate, {
     bool isUrgent = false,
   }) {
-    final color = isUrgent ? const Color(0xFFEF4444) : AppColors.primary;
+    final color = isUrgent ? AppColors.error : AppColors.primary;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.smallGap + 4),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.smallGap),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppRadius.button),
                   ),
                   child: Icon(
                     isUrgent ? Icons.warning_amber_rounded : Icons.assignment,
-                    size: 20,
+                    size: AppIconSizes.button,
                     color: color,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.smallGap + 4),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +410,7 @@ class HomeContent extends StatelessWidget {
                         title,
                         style: AppTextStyles.cardTitle,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.smallGap / 2),
                       Text(
                         subject,
                         style: AppTextStyles.progressLabel,
@@ -368,15 +420,15 @@ class HomeContent extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.smallGap + 4),
             Row(
               children: [
                 const Icon(
                   Icons.calendar_today,
-                  size: 14,
+                  size: AppIconSizes.small,
                   color: AppColors.textSecondary,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.smallGap / 2),
                 Text(
                   'Entrega até ${_formatDate(dueDate)}',
                   style: AppTextStyles.progressLabel,

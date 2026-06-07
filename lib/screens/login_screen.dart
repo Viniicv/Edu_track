@@ -45,11 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Digite seu e-mail';
     }
 
-    final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Digite um e-mail vÃ¡lido';
-    }
-
     if (!AuthService.isInstitutionalEmail(value)) {
       return 'Use seu e-mail @souunit.com.br';
     }
@@ -63,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (value.length < 6) {
-      return 'A senha deve ter no mÃ­nimo 6 caracteres';
+      return 'A senha deve ter no mí­nimo 6 caracteres';
     }
 
     return null;
@@ -99,7 +94,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } on AuthDomainException {
       _showMessage(
-        'Acesso permitido apenas para contas @souunit.com.br.',
+        'Acesso permitido apenas para contas @souunit.com.br',
+        isError: true,
+      );
+    } on GoogleSignInUnsupportedPlatformException {
+      _showMessage(
+        'Login com Google não está disponível no app Windows. Teste no Chrome ou Android.',
         isError: true,
       );
     } on GoogleSignInException catch (error) {
@@ -108,6 +108,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _showMessage(_mapFirebaseAuthError(error), isError: true);
     } on PlatformException catch (error) {
       _showMessage(_mapPlatformError(error), isError: true);
+    } on StateError catch (error) {
+      _showMessage(
+        'Estado inválido no Google Sign-In: ${error.message}',
+        isError: true,
+      );
     } catch (error) {
       _showMessage(
         'Não foi possível entrar: ${error.runtimeType}',
@@ -149,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
       case GoogleSignInExceptionCode.interrupted:
         return 'Login com Google interrompido. Tente novamente.';
       default:
-        return error.description ?? 'NÃ£o foi possÃ­vel entrar com Google.';
+        return error.description ?? 'Não foi possível entrar com Google.';
     }
   }
 

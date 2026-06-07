@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/activity_provider.dart';
@@ -29,12 +31,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
         elevation: 0,
       ),
 
-      // BOTÃƒO FLUTUANTE
+      // BOTÃO FLUTUANTE
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         elevation: 6,
-        onPressed: () {
-          _showAddTaskDialog(context, _selectedDate);
+        onPressed: () async {
+          await _showAddTaskDialog(context, _selectedDate);
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -44,7 +46,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           children: [
             const SizedBox(height: 8),
 
-            // CARD DO CALENDÃRIO
+            // CARD DO CALENDÁRIO
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(16),
@@ -55,7 +57,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               child: Column(
                 children: [
-                  // MÃŠS E ANO
+                  // MÊS E ANO
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -110,8 +112,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   // DIAS DA SEMANA
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children:
-                        ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) {
+                    children: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((day) {
                       return Expanded(
                         child: Center(
                           child: Text(
@@ -139,7 +140,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
             const SizedBox(height: 16),
 
-            // TÃTULO
+            // TÍTULO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Align(
@@ -362,15 +363,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  void _showAddTaskDialog(
+  Future<void> _showAddTaskDialog(
     BuildContext context,
     DateTime date,
-  ) {
+  ) async {
     final titleController = TextEditingController();
-    final subjects = Provider.of<SubjectProvider>(
+    final subjectProvider = Provider.of<SubjectProvider>(
       context,
       listen: false,
-    ).subjects;
+    );
+
+    if (subjectProvider.isLoading) {
+      _showLoadingSubjectsMessage(context);
+      await _waitForSubjectsToLoad(subjectProvider);
+      if (!context.mounted) return;
+    }
+
+    final subjects = subjectProvider.subjects;
 
     if (subjects.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -382,7 +391,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       return;
     }
 
-    String selectedSubject = subjects.first.name;
+    String selectedSubjectId = subjects.first.id!;
 
     showDialog(
       context: context,
@@ -403,19 +412,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: selectedSubject,
+                initialValue: selectedSubjectId,
                 decoration: const InputDecoration(
                   labelText: 'Matéria',
                   border: OutlineInputBorder(),
                 ),
                 items: subjects.map((subject) {
                   return DropdownMenuItem(
-                    value: subject.name,
+                    value: subject.id,
                     child: Text(subject.name),
                   );
                 }).toList(),
                 onChanged: (value) {
-                  selectedSubject = value!;
+                  selectedSubjectId = value!;
                 },
               ),
             ],
@@ -430,20 +439,36 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (titleController.text.trim().isEmpty) return;
+                      final selectedSubject = subjects.firstWhere(
+                        (subject) => subject.id == selectedSubjectId,
+                      );
 
                       final newTask = Activity(
                         title: titleController.text.trim(),
-                        subject: selectedSubject,
+                        subjectId: selectedSubject.id,
+                        subject: selectedSubject.name,
                         dueDate: date,
                         isUrgent: false,
                         isCompleted: false,
                         progress: 0,
                       );
 
-                      await Provider.of<ActivityProvider>(
-                        context,
-                        listen: false,
-                      ).addActivity(newTask);
+                      try {
+                        await Provider.of<ActivityProvider>(
+                          context,
+                          listen: false,
+                        ).addActivity(newTask);
+                      } on DuplicateActivityException {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Já existe uma tarefa com esse nome nesta matéria.',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
 
                       if (!context.mounted) return;
                       Navigator.pop(context);
@@ -464,6 +489,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
         );
       },
+    );
+  }
+
+  Future<void> _waitForSubjectsToLoad(SubjectProvider subjectProvider) async {
+    if (!subjectProvider.isLoading) return;
+
+    final completer = Completer<void>();
+
+    void listener() {
+      if (!subjectProvider.isLoading && !completer.isCompleted) {
+        completer.complete();
+      }
+    }
+
+    subjectProvider.addListener(listener);
+
+    try {
+      await completer.future.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {},
+      );
+    } finally {
+      subjectProvider.removeListener(listener);
+    }
+  }
+
+  void _showLoadingSubjectsMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Carregando matérias...'),
+      ),
     );
   }
 
@@ -523,7 +579,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     const months = [
       'Janeiro',
       'Fevereiro',
-      'MarÃ§o',
+      'Março',
       'Abril',
       'Maio',
       'Junho',

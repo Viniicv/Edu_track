@@ -4,6 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/activity_model.dart';
 import '../services/auth_service.dart';
+import '../utils/activity_filters.dart' as activity_filters;
+import '../utils/activity_validators.dart' as activity_validators;
+import '../utils/date_helpers.dart' as date_helpers;
+
+class DuplicateActivityException implements Exception {
+  const DuplicateActivityException();
+}
 
 class ActivityProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -24,7 +31,7 @@ class ActivityProvider extends ChangeNotifier {
         return;
       }
 
-      _listenToUserActivities(email!.trim().toLowerCase());
+      _listenToUserActivities(email!.trim());
     });
   }
 
@@ -56,53 +63,39 @@ class ActivityProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Activity> getTodayUrgentActivities() {
-    final today = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
+  List<Activity> getTodayPendingActivities() {
+    return activity_filters.todayPendingActivities(
+      _activities,
+      referenceDate: DateTime.now(),
     );
-
-    return _activities.where((activity) {
-      return activity.dueDate.year == today.year &&
-          activity.dueDate.month == today.month &&
-          activity.dueDate.day == today.day &&
-          activity.isUrgent &&
-          !activity.isCompleted;
-    }).toList();
   }
 
-  List<Activity> getNextWeekActivities() {
-    final today = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
+  List<Activity> getNextWeekPendingActivities() {
+    return activity_filters.nextWeekPendingActivities(
+      _activities,
+      referenceDate: DateTime.now(),
     );
-    final nextWeek = today.add(const Duration(days: 7));
+  }
 
-    return _activities.where((activity) {
-      final dueDate = DateTime(
-        activity.dueDate.year,
-        activity.dueDate.month,
-        activity.dueDate.day,
-      );
-      return dueDate.isAfter(today) &&
-          !dueDate.isAfter(nextWeek) &&
-          !activity.isCompleted;
-    }).toList()
-      ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+  List<Activity> getThisWeekPendingActivities() {
+    return activity_filters.thisWeekPendingActivities(
+      _activities,
+      referenceDate: DateTime.now(),
+    );
   }
 
   List<Activity> getActivitiesByDate(DateTime date) {
     return _activities.where((activity) {
-      return activity.dueDate.year == date.year &&
-          activity.dueDate.month == date.month &&
-          activity.dueDate.day == date.day;
+      return date_helpers.isSameDay(activity.dueDate, date);
     }).toList();
   }
 
   Future<void> addActivity(Activity activity) async {
     final userEmail = _currentInstitutionalEmail();
+    if (activity_validators.hasDuplicateActivity(_activities, activity)) {
+      throw const DuplicateActivityException();
+    }
+
     await _firestore.collection('activities').add(
           activity.toFirestore(
             userEmail: userEmail,
@@ -127,7 +120,7 @@ class ActivityProvider extends ChangeNotifier {
   }
 
   String _currentInstitutionalEmail() {
-    final email = AuthService.instance.currentUser?.email?.trim().toLowerCase();
+    final email = AuthService.instance.currentUser?.email?.trim();
     if (!AuthService.isInstitutionalEmail(email)) {
       throw const AuthDomainException();
     }
