@@ -143,12 +143,9 @@ class HomeContent extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'EDUTRACK',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                style: AppTextStyles.mediumTitle.copyWith(
                   letterSpacing: 0.2,
                 ),
               ),
@@ -181,21 +178,17 @@ class HomeContent extends StatelessWidget {
               final name = snapshot.data ?? 'Estudante';
               return Text(
                 'Olá, $name!',
-                style: const TextStyle(
+                style: AppTextStyles.body.copyWith(
                   color: AppColors.textPrimary,
-                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
               );
             },
           ),
           const SizedBox(height: AppSpacing.smallGap),
-          const Text(
+          Text(
             'Aqui estão as suas prioridades:',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 16,
-            ),
+            style: AppTextStyles.body,
           ),
         ],
       ),

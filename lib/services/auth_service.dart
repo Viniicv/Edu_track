@@ -91,11 +91,13 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    await _auth.signOut();
+
+    if (kIsWeb) return;
+
     try {
       await _googleSignIn.signOut();
     } catch (_) {}
-
-    await _auth.signOut();
   }
 
   Future<void> signOutIfDomainIsInvalid() async {

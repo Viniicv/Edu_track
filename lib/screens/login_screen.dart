@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (value.length < 6) {
-      return 'A senha deve ter no mí­nimo 6 caracteres';
+      return 'A senha deve ter no mínimo 6 caracteres';
     }
 
     return null;
@@ -130,13 +130,13 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'invalid-credential':
       case 'wrong-password':
       case 'user-not-found':
-        return 'E-mail ou senha invÃ¡lidos.';
+        return 'E-mail ou senha inválidos.';
       case 'user-disabled':
         return 'Esta conta foi desativada.';
       case 'too-many-requests':
         return 'Muitas tentativas. Tente novamente mais tarde.';
       case 'network-request-failed':
-        return 'Sem conexÃ£o com a internet.';
+        return 'Sem conexão com a internet.';
       default:
         return 'Erro ao autenticar. Tente novamente.';
     }
@@ -145,12 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
   String _mapGoogleSignInError(GoogleSignInException error) {
     switch (error.code) {
       case GoogleSignInExceptionCode.canceled:
-        return 'Login com Google cancelado. Se vocÃª escolheu uma conta, confira o SHA-1/SHA-256 no Firebase.';
+        return 'Login com Google cancelado. Se você escolheu uma conta, confira o SHA-1/SHA-256 no Firebase.';
       case GoogleSignInExceptionCode.clientConfigurationError:
       case GoogleSignInExceptionCode.providerConfigurationError:
         return 'Google Sign-In mal configurado. Confira SHA-1/SHA-256 e o google-services.json.';
       case GoogleSignInExceptionCode.uiUnavailable:
-        return 'NÃ£o foi possÃ­vel abrir a tela do Google Sign-In.';
+        return 'Não foi possível abrir a tela do Google Sign-In.';
       case GoogleSignInExceptionCode.interrupted:
         return 'Login com Google interrompido. Tente novamente.';
       default:
