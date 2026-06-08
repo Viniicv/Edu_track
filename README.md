@@ -1,3 +1,24 @@
+# 📘 EduTrack
+
+O **EduTrack** é um aplicativo focado em ajudar estudantes a organizar suas prioridades, prazos e acompanhar o progresso de suas matérias de forma simples.
+
+## 🛠️ Tecnologias Utilizadas
+* **Desenvolvimento:** Flutter e Dart
+* **Design das Telas:** Figma
+
+## 📱 Telas do Aplicativo
+1. **Login & Cadastro**
+2. **Página Inicial (Início)**
+3. **Adicionar Tarefa**
+4. **Calendário Acadêmico**
+5. **Matérias e Progressos**
+6. **Adicionar Matéria**
+7. **Listas de Atividades**
+
+---
+
+## 👥 Divisão de Telas por Integrante
+
 ## 👥 Divisão de Tarefas por Integrante
 
 | Nome do Aluno                | Telas sob sua responsabilidade           | Principais Atividades                                                                                                                                    | Link do Vídeo de Defesa |
@@ -7,3 +28,10 @@
 | Luiz Gustavo Meneses Santos  | Login e Cadastro                         | Desenvolvimento das telas de autenticação, criação dos campos de entrada de dados e organização dos componentes visuais da tela inicial                  | A definir               |
 | André Luiz Bispo             | Matérias e Progressos, Adicionar Matéria | Criação da listagem de matérias e da tela para cadastro de novas matérias                                                                                | A definir               |
 | Jhoan Guilherme Silva Santos | Listas de Atividades, Adicionar Tarefa   | Desenvolvimento da listagem de tarefas e da tela de cadastro contendo título, data e matéria da atividade                                                | A definir               |
+
+---
+
+## 🏃 Como rodar o projeto
+1. Clone o repositório: `git clone [URL_DO_REPO]`
+2. Baixe os pacotes: `flutter pub get`
+3. Rode o aplicativo: `flutter run`
